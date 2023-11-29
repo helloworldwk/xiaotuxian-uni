@@ -3,17 +3,39 @@ import { ref } from 'vue'
 import { getHomeGoodsGuessLikeAPI } from '@/services/home'
 import { onMounted } from 'vue'
 import type { GuessItem } from '@/types/home'
+import type { PageParams } from '@/types/global'
 
+// 分页数据
+const pageParams: Required<PageParams> = {
+  page: 30,
+  pageSize: 10,
+}
+// 是否完成整个分页请求
+const finsh = ref(false)
 // 获取猜你喜欢的数据
 const guessLike = ref<GuessItem[]>([])
 const getGuessLikeData = async () => {
-  const { result } = await getHomeGoodsGuessLikeAPI()
+  if (finsh.value) {
+    return uni.showToast({ icon: 'none', title: '没有更多数据~' })
+  }
 
-  guessLike.value = result.items
+  const { result } = await getHomeGoodsGuessLikeAPI(pageParams)
+
+  // 每次请求到结果 合并到原数组中
+  guessLike.value = guessLike.value.concat(...result.items)
+  if (pageParams.page < result.pages) {
+    pageParams.page++
+  } else {
+    finsh.value = true
+  }
 }
 
 onMounted(() => {
   getGuessLikeData()
+})
+
+defineExpose({
+  getMore: getGuessLikeData,
 })
 </script>
 
@@ -32,7 +54,7 @@ onMounted(() => {
       </view>
     </navigator>
   </view>
-  <view class="loading-text"> 正在加载... </view>
+  <view class="loading-text"> {{ finsh ? '没有更多数据~' : '正在加载...' }} </view>
 </template>
 
 <style lang="scss">
