@@ -43,6 +43,20 @@ const guessRef = ref<XtxGuessInstance>()
 const scrolltolowerHandler = () => {
   guessRef.value?.getMore()
 }
+
+// 下拉刷新状态(true为已触发, false为未触发)
+const isTriggered = ref(false)
+// 下拉刷新触发的函数
+const refresherrefreshHandler = async () => {
+  isTriggered.value = true
+
+  // 重置猜你喜欢组件的数据
+  guessRef.value?.resetData()
+  // 重新请求轮播图、分类、热门推荐
+  await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData(), guessRef.value?.getMore()])
+
+  isTriggered.value = false
+}
 </script>
 
 <template>
@@ -50,7 +64,8 @@ const scrolltolowerHandler = () => {
   <CustomNavbar />
 
   <!-- 滚动容器 -->
-  <scroll-view scroll-y @scrolltolower="scrolltolowerHandler">
+  <scroll-view scroll-y @scrolltolower="scrolltolowerHandler" @refresherrefresh="refresherrefreshHandler"
+    refresher-enabled :refresher-triggered="isTriggered">
     <!-- 自定义轮播图 -->
     <XtxSwiper :list="bannerList" />
     <!-- 分类 -->

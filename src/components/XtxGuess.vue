@@ -7,7 +7,7 @@ import type { PageParams } from '@/types/global'
 
 // 分页数据
 const pageParams: Required<PageParams> = {
-  page: 30,
+  page: 1,
   pageSize: 10,
 }
 // 是否完成整个分页请求
@@ -30,11 +30,19 @@ const getGuessLikeData = async () => {
   }
 }
 
+// 重置数据
+const resetData = () => {
+  pageParams.page = 1
+  guessLike.value = []
+  finsh.value = false
+}
+
 onMounted(() => {
   getGuessLikeData()
 })
 
 defineExpose({
+  resetData,
   getMore: getGuessLikeData,
 })
 </script>
