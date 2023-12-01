@@ -25,12 +25,15 @@ uni.setNavigationBarTitle({ title: currentHotMap.value!.title })
 // 推荐封面图
 const bannerPicture = ref('')
 // 推荐选项 tabs
-const tabsList = ref<SubTypeItem[]>([])
+const tabsList = ref<(SubTypeItem & { finsh?: boolean })[]>([])
 // 当前tab高亮项下标
 const activeIndex = ref(0)
 // 动态获取数据
 const getHotData = async () => {
-  const { result } = await getHotDataAPI(currentHotMap.value!.url)
+  const { result } = await getHotDataAPI(currentHotMap.value!.url, {
+    page: 30,
+    pageSize: 10,
+  })
 
   bannerPicture.value = result.bannerPicture
   tabsList.value = result.subTypes
@@ -45,8 +48,15 @@ onLoad(() => {
 const onScrolltolower = async () => {
   // 获取当前项
   const currentTabList = tabsList.value[activeIndex.value]
-  // 页码加1
-  currentTabList.goodsItems.page++
+  // 分页条件判断
+  if (currentTabList.goodsItems.page < currentTabList.goodsItems.pages) {
+    // 页码加1
+    currentTabList.goodsItems.page++
+  } else {
+    // currentTabList中添加一个标识 表示已完成加载全部数据
+    currentTabList.finsh = true
+    return uni.showToast({ icon: 'none', title: '没有更多数据了~' })
+  }
   // 调用接口 根据参数 请求新数据
   const { result } = await getHotDataAPI(currentHotMap.value!.url, {
     subType: currentTabList.id,
@@ -103,7 +113,7 @@ const onScrolltolower = async () => {
           </view>
         </navigator>
       </view>
-      <view class="loading-text">正在加载...</view>
+      <view class="loading-text">{{ item.finsh ? '没有更多数据了~' : '正在加载...' }}</view>
     </scroll-view>
   </view>
 </template>
