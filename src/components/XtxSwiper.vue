@@ -16,7 +16,7 @@ const onChange: UniHelper.SwiperOnChange = (ev) => {
 
 <template>
   <view class="carousel">
-    <swiper :circular="true" :autoplay="false" :interval="3000" @change="onChange">
+    <swiper :circular="true" autoplay :interval="3000" @change="onChange">
       <swiper-item v-for="item of list" :key="item.id">
         <navigator url="/pages/index/index" hover-class="none" class="navigator">
           <image mode="aspectFill" class="image" :src="item.imgUrl"></image>
@@ -25,7 +25,12 @@ const onChange: UniHelper.SwiperOnChange = (ev) => {
     </swiper>
     <!-- 指示点 -->
     <view class="indicator">
-      <text v-for="(item, index) in list" :key="item.id" class="dot" :class="{ active: index === activeIndex }"></text>
+      <text
+        v-for="(item, index) in list"
+        :key="item.id"
+        class="dot"
+        :class="{ active: index === activeIndex }"
+      ></text>
     </view>
   </view>
 </template>
