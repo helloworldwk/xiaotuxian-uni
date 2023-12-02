@@ -5,6 +5,9 @@ import { onLoad } from '@dcloudio/uni-app'
 
 import type { GoodsResult } from '@/types/goods'
 
+import AddressPanel from './components/AddressPanel.vue'
+import ServicePanel from './components/ServicePanel.vue'
+
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
@@ -42,9 +45,20 @@ onLoad(() => {
 
 // uni-popup ref
 const popupRef = ref<{
-  open: (type: UniHelper.UniPopupType) => void
+  open: (type?: UniHelper.UniPopupType) => void
   close: () => void
 }>()
+
+// 弹出层条件判断
+const popupName = ref<'address' | 'service'>()
+const openPopup = (name: typeof popupName.value) => {
+  popupName.value = name
+  popupRef.value?.open('bottom')
+}
+// 弹出层关闭
+const popupClose = () => {
+  popupRef.value?.close()
+}
 </script>
 
 <template>
@@ -81,11 +95,11 @@ const popupRef = ref<{
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
-        <view class="item arrow">
+        <view class="item arrow" @tap="() => openPopup('address')">
           <text class="label">送至</text>
           <text class="text ellipsis"> 请选择收获地址 </text>
         </view>
-        <view class="item arrow" @tap="popupRef?.open('bottom')">
+        <view class="item arrow" @tap="() => openPopup('service')">
           <text class="label">服务</text>
           <text class="text ellipsis"> 无忧退 快速退款 免费包邮 </text>
         </view>
@@ -157,9 +171,8 @@ const popupRef = ref<{
   </view>
 
   <uni-popup ref="popupRef" type="bottom" background-color="#fff">
-    <view>内容1</view>
-    <view>内容1</view>
-    <button @tap="popupRef?.close()">关闭弹框</button>
+    <AddressPanel v-if="popupName === 'address'" @close="popupClose" />
+    <ServicePanel v-if="popupName === 'service'" @close="popupClose" />
   </uni-popup>
 </template>
 
