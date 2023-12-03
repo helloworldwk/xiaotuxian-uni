@@ -1,4 +1,5 @@
 import { http } from '@/utils/http'
+import type { LoginResult } from '@/types/member'
 
 // ;/login/Minwx
 type LoginParams = {
@@ -12,7 +13,7 @@ type LoginParams = {
  * @returns
  */
 export const postLoginMinwxAPI = (data: LoginParams) => {
-  return http({
+  return http<LoginResult>({
     method: 'POST',
     url: '/login/wxMin',
     data,
@@ -25,7 +26,7 @@ export const postLoginMinwxAPI = (data: LoginParams) => {
  * @returns
  */
 export const postLoginMinwxSimpleAPI = (phoneNumber: string) => {
-  return http({
+  return http<LoginResult>({
     method: 'POST',
     url: '/login/wxMin/simple',
     data: {
