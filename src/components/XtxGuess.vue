@@ -8,7 +8,7 @@ import type { PageParams } from '@/types/global'
 // 分页数据
 const pageParams: Required<PageParams> = {
   page: 1,
-  pageSize: 10,
+  pageSize: 6,
 }
 // 是否完成整个分页请求
 const finsh = ref(false)
@@ -53,7 +53,12 @@ defineExpose({
     <text class="text">猜你喜欢</text>
   </view>
   <view class="guess">
-    <navigator class="guess-item" v-for="item in guessLike" :key="item.id" :url="`/pages/goods/goods?id=4007498`">
+    <navigator
+      class="guess-item"
+      v-for="item in guessLike"
+      :key="item.id"
+      :url="`/pages/goods/goods?id=4007498`"
+    >
       <image class="image" mode="aspectFill" :src="item.picture"></image>
       <view class="name"> {{ item.name }} </view>
       <view class="price">

@@ -8,7 +8,7 @@ import HotPanel from './components/HotPanel.vue'
 import PageSkeleton from './components/PageSkeleton.vue'
 
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
-import type { XtxGuessInstance } from '@/types/component'
+import { useGuessList } from '@/composables'
 
 // 请求首页轮播图的数据
 const bannerList = ref<BannerItem[]>([])
@@ -41,11 +41,8 @@ onLoad(async () => {
   isLoading.value = false
 })
 
-const guessRef = ref<XtxGuessInstance>()
-// 滚动触底触发
-const scrolltolowerHandler = () => {
-  guessRef.value?.getMore()
-}
+// 调用 猜你喜欢组合式函数
+const { guessRef, onScrolltolower: scrolltolowerHandler } = useGuessList()
 
 // 加载状态
 const isLoading = ref(false)
