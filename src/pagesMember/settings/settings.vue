@@ -1,11 +1,30 @@
 <script setup lang="ts">
-//
+import { useMemberStore } from '@/stores'
+
+const memberStore = useMemberStore()
+
+// 退出登录按钮
+const onLogout = () => {
+  uni.showModal({
+    content: '确定退出登录吗?',
+    success: (res) => {
+      if (res.confirm) {
+        // 为 true 时，表示用户点击了确定按钮
+        // 清除用户信息
+        memberStore.clearProfile()
+
+        // 返回上一个页面
+        uni.navigateBack()
+      }
+    },
+  })
+}
 </script>
 
 <template>
   <view class="viewport">
     <!-- 列表1 -->
-    <view class="list" v-if="true">
+    <view class="list" v-if="memberStore.profile">
       <navigator url="/pagesMember/address/address" hover-class="none" class="item arrow">
         我的收货地址
       </navigator>
@@ -21,8 +40,8 @@
       <navigator hover-class="none" class="item arrow" url=" ">关于小兔鲜儿</navigator>
     </view>
     <!-- 操作按钮 -->
-    <view class="action">
-      <view class="button">退出登录</view>
+    <view class="action" v-if="memberStore.profile">
+      <view class="button" @tap="onLogout">退出登录</view>
     </view>
   </view>
 </template>
