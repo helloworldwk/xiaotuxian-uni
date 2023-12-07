@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getMemberProfileAPI } from '@/services/profile'
+import { getMemberProfileAPI, putMemberProfileAPI } from '@/services/profile'
 import { onLoad } from '@dcloudio/uni-app'
 
 import type { ProfileDetail } from '@/types/member'
+import { useMemberStore } from '@/stores'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
+const memberStore = useMemberStore()
+
 // 获取个人信息
-const profile = ref<ProfileDetail>()
+const profile = ref<ProfileDetail>({} as ProfileDetail)
 const getMemberProfileData = async () => {
   const { result } = await getMemberProfileAPI()
 
@@ -40,6 +43,8 @@ const onAvatarChange = () => {
             // 上传成功
             const avatar = JSON.parse(data).result.avatar
             profile.value!.avatar = avatar
+            // 更新store数据
+            memberStore.profile!.avatar = avatar
             uni.showToast({ icon: 'success', title: '头像更新成功' })
           } else {
             uni.showToast({ icon: 'error', title: '出现错误' })
@@ -48,6 +53,17 @@ const onAvatarChange = () => {
       })
     },
   })
+}
+
+// 保存按钮
+const onSubmit = async () => {
+  const res = await putMemberProfileAPI({
+    nickname: profile.value.nickname,
+  })
+
+  // 更新store数据
+  memberStore.profile!.nickname = res.result.nickname
+  uni.showToast({ icon: 'success', title: '保存成功' })
 }
 </script>
 
@@ -59,8 +75,8 @@ const onAvatarChange = () => {
       <view class="title">个人信息</view>
     </view>
     <!-- 头像 -->
-    <view class="avatar" @tap="onAvatarChange">
-      <view class="avatar-content">
+    <view class="avatar">
+      <view class="avatar-content" @tap="onAvatarChange">
         <image class="image" :src="profile?.avatar" mode="aspectFill" />
         <text class="text">点击修改头像</text>
       </view>
@@ -75,7 +91,7 @@ const onAvatarChange = () => {
         </view>
         <view class="form-item">
           <text class="label">昵称</text>
-          <input class="input" type="text" placeholder="请填写昵称" :value="profile?.nickname" />
+          <input class="input" type="text" placeholder="请填写昵称" v-model="profile!.nickname" />
         </view>
         <view class="form-item">
           <text class="label">性别</text>
@@ -116,7 +132,7 @@ const onAvatarChange = () => {
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button class="form-button">保 存</button>
+      <button class="form-button" @tap="onSubmit">保 存</button>
     </view>
   </view>
 </template>
