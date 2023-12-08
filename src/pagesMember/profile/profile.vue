@@ -28,6 +28,20 @@ const onGenderChange: UniHelper.RadioGroupOnChange = (e) => {
   profile.value.gender = e.detail.value as Gender
 }
 
+// 生日change
+const onBirthdayChange: UniHelper.DatePickerOnChange = (e) => {
+  profile.value.birthday = e.detail.value
+}
+
+// 修改城市
+let fullLocationCode: [string, string, string] = ['', '', '']
+const onFullLocationChange: UniHelper.RegionPickerOnChange = (e) => {
+  // 前端界面修改
+  profile.value.fullLocation = e.detail.value.join(' ')
+  // 保存码值
+  fullLocationCode = e.detail.code!
+}
+
 // 点击修改头像
 const onAvatarChange = () => {
   // 调用拍照/选择图片
@@ -62,9 +76,16 @@ const onAvatarChange = () => {
 
 // 保存按钮
 const onSubmit = async () => {
+  const { nickname, gender, birthday, profession } = profile.value
+  const [provinceCode, cityCode, countyCode] = fullLocationCode
   const res = await putMemberProfileAPI({
-    nickname: profile.value.nickname,
-    gender: profile.value.gender,
+    nickname,
+    gender,
+    birthday,
+    profession,
+    provinceCode,
+    cityCode,
+    countyCode,
   })
 
   // 更新store数据
@@ -120,6 +141,7 @@ const onSubmit = async () => {
             start="1900-01-01"
             :end="new Date()"
             :value="profile?.birthday"
+            @change="onBirthdayChange"
           >
             <view v-if="profile?.birthday">{{ profile?.birthday }}</view>
             <view class="placeholder" v-else>请选择日期</view>
@@ -127,14 +149,19 @@ const onSubmit = async () => {
         </view>
         <view class="form-item">
           <text class="label">城市</text>
-          <picker class="picker" mode="region" :value="profile?.fullLocation?.split(' ')">
+          <picker
+            class="picker"
+            mode="region"
+            :value="profile?.fullLocation?.split(' ')"
+            @change="onFullLocationChange"
+          >
             <view v-if="profile?.fullLocation">{{ profile?.fullLocation }}</view>
             <view class="placeholder" v-else>请选择城市</view>
           </picker>
         </view>
         <view class="form-item">
           <text class="label">职业</text>
-          <input class="input" type="text" placeholder="请填写职业" :value="profile?.profession" />
+          <input class="input" type="text" placeholder="请填写职业" v-model="profile.profession" />
         </view>
       </view>
       <!-- 提交按钮 -->
