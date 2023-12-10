@@ -7,6 +7,7 @@ import type { GoodsResult } from '@/types/goods'
 
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
+import type { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -22,6 +23,27 @@ const getGoodsData = async () => {
   const { result } = await getGoodsAPI(query.id)
 
   goods.value = result
+  // 处理sku弹窗需要的数据格式
+  localdata.value = {
+    _id: result.id,
+    name: result.name,
+    goods_thumb: result.mainPictures[0],
+    sku_list: result.skus.map((sku) => ({
+      _id: sku.id,
+      goods_id: result.id,
+      goods_name: result.name,
+      image: sku.picture,
+      price: sku.price * 100,
+      sku_name_arr: sku.specs.map((skuSpec) => skuSpec.valueName),
+      stock: sku.inventory,
+    })),
+    spec_list: result.specs.map((spec) => ({
+      name: spec.name,
+      list: spec.values.map((value) => ({
+        name: value.name,
+      })),
+    })),
+  }
 }
 
 // 当前主图索引
@@ -59,9 +81,17 @@ const openPopup = (name: typeof popupName.value) => {
 const popupClose = () => {
   popupRef.value?.close()
 }
+
+// 是否显示sku弹窗
+const isShowSku = ref(false)
+// sku组件需要的数据
+const localdata = ref<SkuPopupLocaldata>({} as SkuPopupLocaldata)
 </script>
 
 <template>
+  <!-- sku弹窗 -->
+  <vk-data-goods-sku-popup v-model="isShowSku" :localdata="localdata" />
+
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">
@@ -91,7 +121,7 @@ const popupClose = () => {
 
       <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow">
+        <view class="item arrow" @tap="isShowSku = !isShowSku">
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
