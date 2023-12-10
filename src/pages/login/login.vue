@@ -48,7 +48,10 @@ const loginSuccess = async (profile: LoginResult) => {
 
   setTimeout(() => {
     // 跳转个人中心页面
-    uni.switchTab({ url: '/pages/my/my' })
+    // uni.switchTab({ url: '/pages/my/my' })
+
+    // 跳转到上一个页面
+    uni.navigateBack()
   }, 500)
 }
 </script>
