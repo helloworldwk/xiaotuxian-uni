@@ -1,7 +1,7 @@
 <template>
-  <!-- 购物车 - tabBar页面 -->
+  <!-- 购物车 - 普通页面 -->
   <view>
-    <CartMain :is-tab-bar="true" />
+    <CartMain :is-tab-bar="false" />
   </view>
 </template>
 
