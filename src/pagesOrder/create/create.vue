@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { getMemberOrderPreAPI } from '@/services/order'
+import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
 import { onLoad } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
 
 import type { OrderPreResult } from '@/types/order'
 import { useAddressStore } from '@/stores'
+
+// 获取页面参数
+const query = defineProps<{
+  skuId?: string
+  count?: string
+}>()
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -29,10 +35,20 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 // 信息数据
 const orderResult = ref<OrderPreResult>()
 const getMemberOrderPreData = async () => {
-  const { result } = await getMemberOrderPreAPI()
+  if (query.count && query.skuId) {
+    const { result } = await getMemberOrderPreNowAPI({
+      skuId: query.skuId,
+      count: query.count,
+    })
 
-  // 商品信息数据
-  orderResult.value = result
+    // 商品信息数据
+    orderResult.value = result
+  } else {
+    const { result } = await getMemberOrderPreAPI()
+
+    // 商品信息数据
+    orderResult.value = result
+  }
 }
 
 // 页面加载
