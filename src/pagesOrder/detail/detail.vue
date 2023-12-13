@@ -3,7 +3,11 @@ import { useGuessList } from '@/composables'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
-import { getMemberOrderByIdAPI, getMemberOrderConsignmentByIdAPI } from '@/services/order'
+import {
+  getMemberOrderByIdAPI,
+  getMemberOrderConsignmentByIdAPI,
+  putMemberOrderReceiptByIdAPI,
+} from '@/services/order'
 import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 
 import type { OrderResult } from '@/types/order'
@@ -120,6 +124,19 @@ const onOrderSend = async () => {
     order.value!.orderState = OrderState.DaiShouHuo
   }
 }
+// 确认收货
+const onOrderConfirm = () => {
+  uni.showModal({
+    content: '为保障您的权益，请收到货并确认无误后，再确认收货',
+    success: async (res) => {
+      if (res.confirm) {
+        const { result } = await putMemberOrderReceiptByIdAPI(query.id)
+
+        order.value = result
+      }
+    },
+  })
+}
 </script>
 
 <template>
@@ -177,6 +194,14 @@ const onOrderSend = async () => {
               @tap="onOrderSend"
             >
               模拟发货
+            </view>
+            <!-- 待收货状态: 展示确认收货 -->
+            <view
+              class="button primary"
+              v-if="order.orderState === OrderState.DaiShouHuo"
+              @tap="onOrderConfirm"
+            >
+              确认收货
             </view>
           </view>
         </template>
