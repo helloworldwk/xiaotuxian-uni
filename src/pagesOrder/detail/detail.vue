@@ -4,6 +4,7 @@ import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 import { getMemberOrderByIdAPI } from '@/services/order'
+import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 
 import type { OrderResult } from '@/types/order'
 import { orderStateList, OrderState } from '@/services/constants'
@@ -40,7 +41,7 @@ type PageInstance = Page.PageInstance & WechatMiniprogram.Page.InstanceMethods<a
 // 获取页面栈集合
 const pages = getCurrentPages()
 // 获取当前详情页面的实例
-const pageInstance = pages.at(-1) as PageInstance
+const pageInstance = pages[pages.length - 1] as PageInstance
 
 // 页面渲染完成 绑定关键帧动画
 onReady(() => {
@@ -90,6 +91,22 @@ onLoad(() => {
 const onTimeUp = () => {
   order.value!.orderState = OrderState.YiQuXiao
 }
+
+// 去支付
+const onOrderPay = async () => {
+  // 通过环境变量区分开发环境
+  if (import.meta.env.DEV) {
+    // 开发环境：模拟支付，修改订单状态为已支付
+    await getPayMockAPI({ orderId: query.id })
+  } else {
+    // 生产环境：获取支付参数 + 发起微信支付
+    const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
+    await wx.requestPayment(res.result)
+  }
+
+  // 关闭当前页，再跳转支付结果页
+  uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
+}
 </script>
 
 <template>
@@ -118,7 +135,7 @@ const onTimeUp = () => {
             <text class="time">支付剩余</text>
             <!-- 00 时 29 分 59 秒 -->
             <uni-countdown
-              :second="3"
+              :second="order.countdown"
               @timeup="onTimeUp"
               color="#fff"
               splitor-color="#fff"
@@ -126,7 +143,7 @@ const onTimeUp = () => {
               :show-colon="false"
             />
           </view>
-          <view class="button">去支付</view>
+          <view class="button" @tap="onOrderPay">去支付</view>
         </template>
         <!-- 其他订单状态:展示再次购买按钮 -->
         <template v-else>
