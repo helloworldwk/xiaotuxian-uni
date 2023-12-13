@@ -15,6 +15,7 @@ import type {
 import { computed } from 'vue'
 
 import { postMemberCartAPI } from '@/services/cart'
+import type { AddressItem } from '@/types/address'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -132,6 +133,17 @@ const onByNow = (e: SkuPopupEvent) => {
   // 关闭 sku
   isShowSku.value = false
 }
+
+// 选择地址面板 当前选择的地址
+const getCurrentAddress = (address: AddressItem) => {
+  currentAddress.value = address
+}
+const currentAddress = ref<AddressItem>()
+const currentAddressName = computed(() => {
+  return currentAddress.value
+    ? `${currentAddress.value.fullLocation}${currentAddress.value.address}`
+    : '请选择收获地址'
+})
 </script>
 
 <template>
@@ -187,7 +199,7 @@ const onByNow = (e: SkuPopupEvent) => {
         </view>
         <view class="item arrow" @tap="() => openPopup('address')">
           <text class="label">送至</text>
-          <text class="text ellipsis"> 请选择收获地址 </text>
+          <text class="text ellipsis"> {{ currentAddressName }} </text>
         </view>
         <view class="item arrow" @tap="() => openPopup('service')">
           <text class="label">服务</text>
@@ -261,7 +273,11 @@ const onByNow = (e: SkuPopupEvent) => {
   </view>
 
   <uni-popup ref="popupRef" type="bottom" background-color="#fff">
-    <AddressPanel v-if="popupName === 'address'" @close="popupClose" />
+    <AddressPanel
+      v-if="popupName === 'address'"
+      @close="popupClose"
+      @getCurrentAddress="getCurrentAddress"
+    />
     <ServicePanel v-if="popupName === 'service'" @close="popupClose" />
   </uni-popup>
 </template>

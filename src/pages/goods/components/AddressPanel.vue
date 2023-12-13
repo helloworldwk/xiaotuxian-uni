@@ -1,7 +1,44 @@
 <script setup lang="ts">
+import { getMemberAddressAPI } from '@/services/address'
+import type { AddressItem } from '@/types/address'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { computed } from 'vue'
+import { ref } from 'vue'
+
 const emits = defineEmits<{
   (event: 'close'): void
+  (event: 'getCurrentAddress', address: AddressItem): void
 }>()
+
+// 获取收货地址列表
+const addressList = ref<AddressItem[]>([])
+// 默认选择地址
+const activeIndex = ref(-1)
+const currentAddress = computed(() => {
+  return addressList.value[activeIndex.value]
+})
+
+const getMemberAddressData = async () => {
+  const { result } = await getMemberAddressAPI()
+
+  addressList.value = result
+}
+getMemberAddressData()
+
+// 地址行点击
+const onAddressItemClick = (index: number) => {
+  activeIndex.value = index
+}
+
+// 确定按钮
+const onConfirm = () => {
+  if (!currentAddress.value) {
+    return uni.showToast({ icon: 'none', title: '请选择一个地址' })
+  }
+
+  emits('getCurrentAddress', currentAddress.value)
+  emits('close')
+}
 </script>
 
 <template>
@@ -12,25 +49,20 @@ const emits = defineEmits<{
     <view class="title">配送至</view>
     <!-- 内容 -->
     <view class="content">
-      <view class="item">
-        <view class="user">李明 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-checked"></text>
-      </view>
-      <view class="item">
-        <view class="user">王东 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-ring"></text>
-      </view>
-      <view class="item">
-        <view class="user">张三 13824686868</view>
-        <view class="address">北京市朝阳区孙河安平北街6号院</view>
-        <text class="icon icon-ring"></text>
+      <view
+        class="item"
+        v-for="(item, index) in addressList"
+        :key="item.id"
+        @tap="() => onAddressItemClick(index)"
+      >
+        <view class="user">{{ item.receiver }} {{ item.contact }}</view>
+        <view class="address">{{ item.fullLocation }}{{ item.address }}</view>
+        <text class="icon" :class="activeIndex === index ? 'icon-checked' : 'icon-ring'"></text>
       </view>
     </view>
     <view class="footer">
-      <view class="button primary"> 新建地址 </view>
-      <view v-if="false" class="button primary">确定</view>
+      <view v-if="addressList.length" class="button primary" @tap="onConfirm">确定</view>
+      <view v-else class="button primary"> 新建地址 </view>
     </view>
   </view>
 </template>
