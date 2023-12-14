@@ -94,3 +94,16 @@ export const getMemberOrderLogisticsByIdAPI = (id: string) => {
     url: `/member/order/${id}/logistics`,
   })
 }
+
+/**
+ * 删除订单 仅在订单状态为待评价，已完成，已取消时，可删除订单。
+ * @param data 请求参数 ids: 订单集合
+ * @returns
+ */
+export const deleteMemberOrderAPI = (data: { ids: string[] }) => {
+  return http({
+    method: 'DELETE',
+    url: '/member/order',
+    data,
+  })
+}
