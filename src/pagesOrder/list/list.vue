@@ -3,6 +3,10 @@ import { ref } from 'vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
+// 获取页面参数
+const query = defineProps<{
+  type: string
+}>()
 // tabs 数据
 const orderTabs = ref([
   { orderState: 0, title: '全部' },
@@ -13,7 +17,7 @@ const orderTabs = ref([
 ])
 
 // 高亮下标
-const activeIndex = ref(0)
+const activeIndex = ref(+query.type)
 </script>
 
 <template>
