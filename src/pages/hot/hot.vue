@@ -140,6 +140,11 @@ page {
   position: absolute;
   left: 0;
   top: 0;
+
+  image {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .scroll-view {

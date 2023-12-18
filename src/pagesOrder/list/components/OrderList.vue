@@ -100,8 +100,10 @@ const onOrderPay = async (id: string) => {
     await getPayMockAPI({ orderId: id })
   } else {
     // 生产环境：获取支付参数 + 发起微信支付
+    // #ifdef MP-WEIXIN
     const res = await getPayWxPayMiniPayAPI({ orderId: id })
     await wx.requestPayment(res.result)
+    // #endif
   }
 
   // 支付成功

@@ -120,9 +120,11 @@ const onOrderPay = async () => {
     // 开发环境：模拟支付，修改订单状态为已支付
     await getPayMockAPI({ orderId: query.id })
   } else {
+    // #ifdef MP-WEIXIN
     // 生产环境：获取支付参数 + 发起微信支付
     const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
     await wx.requestPayment(res.result)
+    // #endif
   }
 
   // 关闭当前页，再跳转支付结果页
@@ -183,6 +185,7 @@ const onOrderDelete = () => {
 <template>
   <!-- 自定义导航栏: 默认透明不可见, scroll-view 滚动到 50 时展示 -->
   <view class="navbar" :style="{ paddingTop: safeAreaInsets?.top + 'px' }">
+    <!-- #ifdef MP-WEIXIN -->
     <view class="wrap">
       <navigator
         v-if="pages.length > 1"
@@ -193,6 +196,7 @@ const onOrderDelete = () => {
       </navigator>
       <view class="title">订单详情</view>
     </view>
+    <!-- #endif -->
   </view>
   <scroll-view scroll-y class="viewport" id="scroller" @scrolltolower="onScrolltolower">
     <template v-if="order">
