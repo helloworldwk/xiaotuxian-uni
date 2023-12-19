@@ -79,7 +79,7 @@ const refresherrefreshHandler = async () => {
     :refresher-triggered="isTriggered"
   >
     <!-- 骨架屏 -->
-    <PageSkeleton v-if="true" />
+    <PageSkeleton v-if="isLoading" />
 
     <template v-else>
       <!-- 自定义轮播图 -->
