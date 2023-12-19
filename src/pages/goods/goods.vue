@@ -263,10 +263,10 @@ const currentAddressName = computed(() => {
       <button class="icons-button" open-type="contact">
         <text class="icon-handset"></text>客服
       </button>
+      <!-- #endif -->
       <navigator class="icons-button" url="/pages/cart/cart2" open-type="navigate">
         <text class="icon-cart"></text>购物车
       </navigator>
-      <!-- #endif -->
     </view>
     <view class="buttons">
       <view class="addcart" @tap="() => openSkuPopup(SkuMode.Cart)"> 加入购物车 </view>
@@ -285,6 +285,11 @@ const currentAddressName = computed(() => {
 </template>
 
 <style lang="scss">
+/* #ifdef H5 || APP-PLUS */
+.toolbar .icons .navigator-wrap {
+  flex: 1;
+}
+/* #endif */
 page {
   height: 100%;
   overflow: hidden;

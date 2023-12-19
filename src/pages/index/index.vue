@@ -79,7 +79,7 @@ const refresherrefreshHandler = async () => {
     :refresher-triggered="isTriggered"
   >
     <!-- 骨架屏 -->
-    <PageSkeleton v-if="isLoading" />
+    <PageSkeleton v-if="true" />
 
     <template v-else>
       <!-- 自定义轮播图 -->
@@ -95,6 +95,9 @@ const refresherrefreshHandler = async () => {
 </template>
 
 <style lang="scss">
+/* #ifdef APP-PLUS */
+#app,
+/* #endif */
 page {
   display: flex;
   flex-direction: column;

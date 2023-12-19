@@ -194,6 +194,12 @@
 </template>
 
 <style scoped>
+/* #ifdef H5 || APP-PLUS */
+/* H5端默认开启 scoped 样式隔离，导致组件基础样式无效 */
+@import './styles/ViewPort.scss';
+@import './styles/Categories.scss';
+/* #endif */
+
 .sk-transparent {
   color: transparent !important;
 }
