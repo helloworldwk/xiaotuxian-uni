@@ -37,6 +37,7 @@ const form = ref({
 })
 
 // 所在地区修改
+// #ifdef MP-WEIXIN
 const onFullLocationChange: UniHelper.RegionPickerOnChange = (e) => {
   // 省市区(前端展示)
   form.value.fullLocation = e.detail.value.join(' ')
@@ -44,6 +45,15 @@ const onFullLocationChange: UniHelper.RegionPickerOnChange = (e) => {
   const [provinceCode, cityCode, countyCode] = e.detail.code!
   Object.assign(form.value, { provinceCode, cityCode, countyCode })
 }
+// #endif
+
+// #ifdef H5 || APP-PLUS
+const onCityChange: UniHelper.UniDataPickerOnChange = (e) => {
+  // 省市区(后端参数)
+  const [provinceCode, cityCode, countyCode] = e.detail.value.map((item) => item.value)
+  Object.assign(form.value, { provinceCode, cityCode, countyCode })
+}
+// #endif
 
 // 修改 是否默认地址
 const onSwitchChange: UniHelper.SwitchOnChange = (e) => {
@@ -88,7 +98,7 @@ const formRules: UniHelper.UniFormsRules = {
       { pattern: /^1[3-9]\d{9}$/gi, errorMessage: '手机号码格式不正确' },
     ],
   },
-  fullLocation: {
+  countyCode: {
     rules: [{ required: true, errorMessage: '请选择所在地区' }],
   },
   address: {
@@ -109,7 +119,7 @@ const formRules: UniHelper.UniFormsRules = {
         <text class="label">手机号码</text>
         <input class="input" placeholder="请填写收货人手机号码" v-model="form.contact" />
       </uni-forms-item>
-      <uni-forms-item name="fullLocation" class="form-item">
+      <uni-forms-item name="countyCode" class="form-item">
         <text class="label">所在地区</text>
         <!-- #ifdef H5 || APP-PLUS -->
         <uni-data-picker
@@ -121,6 +131,9 @@ const formRules: UniHelper.UniFormsRules = {
           :step-searh="true"
           self-field="code"
           parent-field="parent_code"
+          :clear-icon="false"
+          @change="onCityChange"
+          v-model="form.countyCode"
         />
         <!-- #endif -->
         <!-- #ifdef MP-WEIXIN -->
@@ -155,6 +168,13 @@ const formRules: UniHelper.UniFormsRules = {
 </template>
 
 <style lang="scss">
+/* #ifdef H5 || APP-PLUS */
+:deep(.selected-area) {
+  flex: initial;
+  height: initial;
+}
+/* #endif */
+
 page {
   background-color: #f4f4f4;
 }
